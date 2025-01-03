@@ -1,101 +1,171 @@
-import Image from "next/image";
+"use client"
+
+import React , {  useEffect, useRef, useState } from "react";
+import { useRouter } from 'next/navigation'
+
+
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.js
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const screenRef = useRef(null)
+  const videoRef = useRef(null);
+  // const [fullscreen, setFullscreen] = useState<boolean>(false);
+  const photoRef = useRef(null);
+  // const [orientation, setOrientation] = useState("portrait");
+  const [cleanBase64, setBase64] = useState(""); 
+  const [send, setData] = useState(false);
+  const [winWidth, setWidth] = useState(null);
+  const [winHeight, setHeight] = useState(null);
+  const [change, setchange] = useState(false);
+  const wordList = ['apple', 'orange', 'grapes'];
+  const router = useRouter();
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+  const getVideo = () => {
+
+      navigator.mediaDevices
+        .getUserMedia({ video:{ width: 1920, height: 1080, facingMode:"environment" } })
+        .then((stream) => {
+          if(videoRef !== null) {
+            videoRef.current.srcObject = stream;
+            videoRef.current.play();
+          }
+        })
+        .catch((error) => {
+          console.error("Error getting video stream", error);
+        });
+      }
+
+
+  const analyzeImage = async (base64Image) => {
+    console.log("entered url");
+    const GOOGLE_API_KEY = process.env.NEXT_PUBLIC_API_KEY;
+    const endpoint = `https://vision.googleapis.com/v1/images:annotate?key=${GOOGLE_API_KEY}`;
+
+    const requestBody = {
+      requests: [
+        {
+          image: {
+            content: base64Image, // Base64 image data
+          },
+          features: [
+            {
+              type: "DOCUMENT_TEXT_DETECTION", // Feature type
+            },
+          ],
+        },
+      ],
+    };
+
+    try {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json", // Ensure JSON content type
+        },
+        body: JSON.stringify(requestBody), // Send the request body
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        const word = data.responses[0].fullTextAnnotation.text;
+        console.log(word);
+        word.split('\n').forEach((element) => {
+          const x = element.toLowerCase();
+          if(wordList.includes(x)){
+            window.sessionStorage.setItem("word", x);
+            setchange(true);
+          }
+        });
+        
+        
+        
+      } else {
+        console.error("Error from API:", data.error.message);
+      }
+    } catch (error) {
+      console.error("Network or API error:", error);
+    }
+  };
+
+ 
+   
+
+  const takePhoto = () => {
+
+    if (!videoRef.current || !photoRef.current) return;
+    if (typeof window !== "undefined") {
+        const width = winWidth
+        const height = winHeight;
+
+        const video = videoRef.current;
+        const photo = photoRef.current;
+        if(!photo) return(() => {console.error("Can not opencanvas");});
+      
+        photo.width = width;
+        photo.height = height;
+
+
+        const ctx = photo.getContext("2d");
+        if(!ctx) return(() => {console.error("Can not opencanvas");});
+        ctx.drawImage(video, 0, 0, photo.width, photo.height);
+
+        const image = photo.toDataURL("image/base64", 0.5);
+        const imgData = image.split(",")[1];
+        setBase64(imgData);
+        console.log(cleanBase64);
+        setData(true);
+      }
+  };
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      getVideo();
+    }
+  }, []);
+
+  // Only access window dimensions in the client
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setWidth(window.innerWidth || 1080);
+      setHeight(window.innerHeight || 1920);
+    }
+  }, []);
+ 
+    if (change) {
+      router.push('/model');
+      console.log("pagechange");
+      setchange(false);
+    }
+    else {}  // Add your else condition here if needed.
+ 
+
+  if (send) {
+    analyzeImage(cleanBase64);
+    setData(false);
+  }
+  else {}
+
+  return (
+    
+    <div 
+      className="2xl:container align-middle overflow-hidden"
+      ref={screenRef}>
+      <video
+       className="absolute  w-full h-full object-cover z-30"  // Use the full viewport size and cover the image
+        ref={videoRef}
+        autoPlay
+        playsInline
+        muted
+      ></video>
+      <canvas  className="hidden" ref={photoRef}></canvas>
+      <button className="absolute  size-24 z-30 bg-black rounded-full border-4 border-trans-white backdrop-blur" onClick={takePhoto} >click</button>
+      {/* <canvas ref={photoRef}></canvas>
+      <button
+        onClick={takePhoto}
+      >
+        {orientation === "portrait" ? "Portrait Mode" : "Landscape Mode"}
+      </button> */}
     </div>
   );
 }
+
+
