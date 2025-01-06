@@ -22,8 +22,7 @@ export default function Home() {
 
   const getVideo = () => {
 
-      navigator.mediaDevices
-        .getUserMedia({ video:{ width: 1920, height: 1080, facingMode:"environment" } })
+      navigator.mediaDevices.getUserMedia({ video:{ width: 1920, height: 1080, facingMode:"environment" } })
         .then((stream) => {
           if(videoRef !== null) {
             videoRef.current.srcObject = stream;
@@ -114,12 +113,12 @@ export default function Home() {
         setBase64(imgData);
         console.log(cleanBase64);
         setData(true);
-      }
+      }else{}
   };
   useEffect(() => {
     if (typeof window !== "undefined") {
       getVideo();
-    }
+    } else{}   
   }, []);
 
   // Only access window dimensions in the client
@@ -127,7 +126,7 @@ export default function Home() {
     if (typeof window !== "undefined") {
       setWidth(window.innerWidth || 1080);
       setHeight(window.innerHeight || 1920);
-    }
+    } else{}
   }, []);
  
     if (change) {
@@ -147,7 +146,7 @@ export default function Home() {
   return (
     
     <div 
-      className="2xl:container align-middle overflow-hidden"
+      className="2xl:container align-middle  overflow-hidden"
       ref={screenRef}>
       <video
        className="absolute  w-full h-full object-cover z-30"  // Use the full viewport size and cover the image
