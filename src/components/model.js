@@ -1,19 +1,82 @@
 import '@google/model-viewer';
+import React ,{ useEffect, useRef, useState } from 'react';
 
-const Model = () => (
+const Model = ({
+  src,
+  poster,
+  alt,
+  iosSrc,
+  shadowIntensity = 1,
+  cameraControls = true,
+  autoRotate = false,
+  ar = false,
+  className = "w-96 h-96",
+  ...props
+}) => {
+  const modelViewerRef = useRef(null);
+  const [isARSupported, setIsARSupported] = useState(false);
+  const [isPageLoaded, setIsPageLoaded] = useState(false);
+  useEffect(() => {
+ 
+      setIsPageLoaded(true);
+      const modelViewer = modelViewerRef.current;
+      if (modelViewer) {
+        setIsARSupported(modelViewer.canActivateAR);
+      }
+  
+  }, []);
+useEffect(() => {
+  const activateAR = async () => {
+    if (modelViewerRef.current) {
+      const arView = await modelViewerRef.current.activateAR();
+      if (arView) {
+        console.log("AR View activated");
+        setIsPageLoaded(true);
+      } else {
+        console.error("Failed to activate AR");
+      }
+    }
+  };
+  activateAR()
+})
+  
 
-  <model-viewer
-    src="/Astronaut.glb"
-    ios-src=""
-    poster="https://cdn.glitch.com/36cb8393-65c6-408d-a538-055ada20431b%2Fposter-astronaut.png?v=1599079951717"
-    alt="A 3D model of an astronaut"
-    shadow-intensity="1"
-    camera-controls
-    auto-rotate
-    ar
-    className="w-96 h-96"
-  ></model-viewer>
+  return (
+    <div className="flex flex-col items-center">
+    {isPageLoaded ? (
+      <>
+      <model-viewer
+        ref={modelViewerRef}
+        src={src}
+        ios-src={iosSrc}
+        poster={poster}
+        alt={alt}
+        ar={true}
+        ar-mode
+        shadow-intensity={shadowIntensity}
+        camera-controls={cameraControls}
+        auto-rotate={autoRotate}
+        className={className}
+        {...props}
+      >
+        {/* <button
+          // slot="ar-button"
+          className="custom-ar-button"
+          onClick={activateAR}
+        >
+          Launch AR
+        </button> */}
+      </model-viewer>
+      <p className="mt-4 text-cyan-600">
+        AR Support: {isARSupported ? "Supported" : "Not Supported"}
+      </p>
+      </>
 
-)
+      ) : (
+        <p>Loading, please wait...</p>
+      )}
+    </div>
+  );
+}
 
 export default Model;
