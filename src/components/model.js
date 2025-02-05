@@ -25,7 +25,6 @@ const Model = ({
       }
   
   }, []);
-useEffect(() => {
   const activateAR = async () => {
     if (modelViewerRef.current) {
       const arView = await modelViewerRef.current.activateAR();
@@ -37,8 +36,10 @@ useEffect(() => {
       }
     }
   };
-  activateAR()
-})
+// useEffect(() => {
+  
+//   activateAR()
+// })
   
 
   return (
@@ -59,13 +60,13 @@ useEffect(() => {
         className={className}
         {...props}
       >
-        {/* <button
+        <button
           // slot="ar-button"
           className="custom-ar-button"
           onClick={activateAR}
         >
-          Launch AR
-        </button> */}
+          
+        </button>
       </model-viewer>
       <p className="mt-4 text-cyan-600">
         AR Support: {isARSupported ? "Supported" : "Not Supported"}

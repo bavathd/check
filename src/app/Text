@@ -1,4 +1,24 @@
-"use client";
+{
+  /* Cropping Canvas and Frame */
+}
+<div className="relative bottom-[20%] z-40 flex flex-col items-center">
+  {/* Wrapper for the canvas */}
+  <div className="relative">
+    {/* Cropping Canvas */}
+    <canvas
+      className="shadow-lg rounded-3xl max-w-full max-h-full mx-auto"
+      ref={cropRef}
+    ></canvas>
+
+    {/* Corner Borders - Positioned Outside the Canvas */}
+    <div className="absolute top-[-12px] left-[-12px] w-12 h-12 border-t-4 border-l-4 border-blue-500 rounded-tl-3xl animate-scanner-top-left"></div>
+    <div className="absolute top-[-12px] right-[-12px] w-12 h-12 border-t-4 border-r-4 border-blue-500 rounded-tr-3xl animate-scanner-top-right"></div>
+    <div className="absolute bottom-[-12px] left-[-12px] w-12 h-12 border-b-4 border-l-4 border-blue-500 rounded-bl-3xl animate-scanner-bottom-left"></div>
+    <div className="absolute bottom-[-12px] right-[-12px] w-12 h-12 border-b-4 border-r-4 border-blue-500 rounded-br-3xl animate-scanner-bottom-right"></div>
+  </div>
+</div>;
+
+("use client");
 
 import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -92,13 +112,6 @@ export default function Home() {
         setIsVisible(true);
         console.log(word);
         console.log(items);
-        word.split("\n").forEach((element) => {
-          const x = element.toLowerCase();
-          if (items.includes(x)) {
-            window.sessionStorage.setItem("word", x);
-            setchange(true);
-          }
-        });
       } else {
         console.error("Error from API:", data.error.message);
       }
@@ -112,8 +125,8 @@ export default function Home() {
     if (!videoRef.current || !photoRef.current) return;
     if (typeof window !== "undefined") {
       // Define the dimensions of the area of interest (scanner box)
-      const boxWidth = 320; // width of the scanner box in pixels
-      const boxHeight = 320; // height of the scanner box in pixels
+      const boxWidth = 160; // width of the scanner box in pixels
+      const boxHeight = 160; // height of the scanner box in pixels
 
       const video = videoRef.current;
       const photo = photoRef.current;
@@ -153,35 +166,25 @@ export default function Home() {
     }
   };
 
-  const drawScannedTextToCanvas = async () => {
+  const drawScannedTextToCanvas = () => {
     const canvas = photoRef.current;
     if (canvas) {
       const ctx = canvas.getContext("2d");
 
       // Define canvas dimensions and styling
       const padding = 20; // Padding around the text
-      const maxWidth = 300; // Max width of the canvas
+      const maxWidth = 100; // Max width of the canvas
       const lineHeight = 20; // Line height for text
 
       // Calculate canvas height based on text lines
-      const lines = scannedText.trim().split("\n");
-      console.log(lines);
+      const lines = scannedText.split("\n");
       const canvasHeight = lines.length * lineHeight + padding * 2;
-      const match = lines.find((line) => {
-        const x = line.toLowerCase();
-        console.log(x);
-        items.includes(x);
+      lines.forEach((x) => {
+        const w = x.toLocaleLowerCase();
+        if (items.includes(w)) {
+          setSelected(w);
+        }
       });
-      console.log(match);
-      if (match) {
-        console.log(match.toLowerCase());
-        await AsyncStorage.setItem("word", match.toLowerCase());
-        setTimeout(() => {
-          setchange(true);
-        }, 2000);
-      } else {
-      }
-
       // Set canvas size
       canvas.width = maxWidth;
       canvas.height = canvasHeight;
@@ -219,11 +222,14 @@ export default function Home() {
       ctx.font = "bold 30px Arial";
       ctx.textAlign = "center";
 
-      const y = padding + lineHeight;
-      ctx.fillText(lines, canvas.width / 2, y);
+      // Loop through each line and draw
+      lines.forEach((line, index) => {
+        const y = padding + lineHeight * (index + 1);
+        ctx.fillText(line, canvas.width / 2, y);
+      });
 
       // Add animation for a "pop-out" effect
-      canvas.style.transition = "transform 4s ease-out";
+      canvas.style.transition = "transform 0.3s ease-out";
       canvas.style.transform = "scale(1.1)";
       setTimeout(() => {
         canvas.style.transform = "scale(1)";
@@ -231,10 +237,10 @@ export default function Home() {
 
       // Center and display the canvas
       canvas.style.position = "absolute";
-      canvas.style.top = "30%";
-      canvas.style.left = "0%";
+      canvas.style.top = "50%";
+      canvas.style.left = "50%";
       canvas.style.transform = "translate(-50%, -50%)"; // Fix for perfect centering
-      canvas.style.borderRadius = "20px";
+      canvas.style.borderRadius = "15px";
       canvas.style.boxShadow = "0 10px 20px rgba(0, 0, 0, 0.2)";
       canvas.style.background = "#ffffff";
       canvas.style.zIndex = 100;
@@ -247,8 +253,8 @@ export default function Home() {
     if (video) {
       const drawFrame = () => {
         const canvas = cropRef.current;
-        const boxWidth = 300; // width of the scanner box in pixels
-        const boxHeight = 300; // height of the scanner box in pixel
+        const boxWidth = 320; // width of the scanner box in pixels
+        const boxHeight = 320; // height of the scanner box in pixel
         if (!canvas) return;
         canvas.width = boxWidth;
         canvas.height = boxHeight;
@@ -340,8 +346,10 @@ export default function Home() {
         playsInline
         muted
       />
+
       {/* Overlay */}
       <div className="absolute inset-0 bg-black bg-opacity-40 backdrop-blur-2xl z-10"></div>
+
       {/* Photo Canvas */}
       <canvas
         className={`absolute z-30 ${
@@ -349,6 +357,7 @@ export default function Home() {
         }  transform top-12 size-fit`}
         ref={photoRef}
       ></canvas>
+
       {/* Cropping Canvas and Frame */}
       <div className="relative bottom-[20%] z-40 flex flex-col items-center">
         {/* Wrapper for the canvas */}
@@ -366,7 +375,8 @@ export default function Home() {
           <div className="absolute bottom-[-12px] right-[-12px] w-12 h-12 border-b-4 border-r-4 border-blue-500 rounded-br-3xl animate-scanner-bottom-right"></div>
         </div>
       </div>
-      ;{/* Button Section */}
+
+      {/* Button Section */}
       <div className="absolute bottom-10 z-40 w-full flex justify-center">
         <button
           className="flex items-center gap-3 bg-blue-600 text-white font-bold rounded-full px-6 py-2 shadow-md hover:bg-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-300 transition-all duration-300"
