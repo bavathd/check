@@ -67,14 +67,15 @@ const Model = ({
   }
   if(!loadset) {
   loadfiles();
-  setloader(true);
-  }
-  },[loadset, iosSrc, src])
   
+  }
+  
+  },[loadset, iosSrc, src])
+
   useEffect(() => {
    
     if(srcFile && srcIosFile) {
-      
+      setloader(true);
       console.log(srcFile, srcIosFile)
       setvisisble(true)
 
