@@ -1,4 +1,11 @@
 {
+  const response = await fetch(src)
+  const blob = await response.blob();
+  const url = URL.createObjectURL(blob) 
+
+
+
+
   /* Cropping Canvas and Frame */
 }
 <div className="relative bottom-[20%] z-40 flex flex-col items-center">

@@ -34,6 +34,7 @@ export default function Home() {
             shadowIntensity={0.8}
             autoRotate={true}
             ar={true}
+            page = "/"
             className=" max-w-lg mx-auto"
           />
         ) : (
