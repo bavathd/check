@@ -22,9 +22,9 @@ const Model = ({
   const [srcFile, setSrcFile] = useState(null);
   const [srcIosFile, setSrcIosfile] = useState(null);
   const [isVisible, setvisisble] = useState(false);
+  const [loadset, setloader] = useState(false);
   const [arStatus, setArStatus] = useState("")
   const router = useRouter();
-
   useEffect(() => {
  
       setIsPageLoaded(true);
@@ -65,14 +65,19 @@ const Model = ({
       })
       .catch((error) => console.error("Error IOS: ", error))
   }
+  if(!loadset) {
   loadfiles();
-  })
+  setloader(true);
+  }
+  },[loadset, iosSrc, src])
+  
   useEffect(() => {
    
     if(srcFile && srcIosFile) {
       
       console.log(srcFile, srcIosFile)
       setvisisble(true)
+
       // activateAR();
     }
     else {
