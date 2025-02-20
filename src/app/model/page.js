@@ -23,18 +23,18 @@ export default function Home() {
     word();
   });
   return (
-    <div className="2x:container flex justify-center items-center h-screen overflow-hidden">
+    <div className="relative flex flex-col justify-center items-center h-screen overflow-hidden bg-red-300">
       <>
         {isload ? (
           <Model
             iosSrc={`/${modelName}/3d.usdz`}
             src={`/${modelName}/3d.glb`}
-            poster="https://cdn.glitch.com/36cb8393-65c6-408d-a538-055ada20431b%2Fposter-astronaut.png?v=1599079951717"
+            // poster="https://cdn.glitch.com/36cb8393-65c6-408d-a538-055ada20431b%2Fposter-astronaut.png?v=1599079951717"
             alt="A 3D model of an astronaut"
-            shadowIntensity={0.8}
+            shadowIntensity={1.5}
             autoRotate={true}
             ar={true}
-            className=" max-w-lg mx-auto"
+            className="w-screen h-screen mx-auto"
           />
         ) : (
           <p> the page is loading</p>

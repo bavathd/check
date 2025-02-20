@@ -331,31 +331,31 @@ export default function Home() {
   }, [router, change]);
 
   return (
-    <div className="relative flex justify-center items-center h-screen bg-gray-600">
+    <div className="relative flex justify-center items-center h-screen w-screen bg-gray-600 overflow-hidden">
       {/* Video Stream */}
       <video
-        className="absolute w-full h-full inset-0"
+        className="absolute w-full h-full object-cover"
         ref={videoRef}
         autoPlay
         playsInline
         muted
       />
       {/* Overlay */}
-      <div className="absolute inset-0 bg-black bg-opacity-40 backdrop-blur-2xl z-10"></div>
+      <div className="absolute inset-0 bg-black bg-opacity-40 backdrop-blur-xl z-10"></div>
       {/* Photo Canvas */}
       <canvas
-        className={`absolute z-30 ${
-          isVisible ? "block" : "hidden"
-        }  transform top-12 size-fit`}
+        className={`absolute z-30 transition-opacity duration-300 ${
+          isVisible ? "opacity-100" : "opacity-0"
+        }  top-12 w-auto max-w-full max-h-full bg-black`}
         ref={photoRef}
       ></canvas>
       {/* Cropping Canvas and Frame */}
-      <div className="relative bottom-[20%] z-40 flex flex-col items-center">
+      <div className="relative z-40 flex flex-col items-center">
         {/* Wrapper for the canvas */}
         <div className="relative">
           {/* Cropping Canvas */}
           <canvas
-            className="shadow-lg rounded-3xl max-w-full max-h-full mx-auto"
+            className="shadow-lg rounded-3xl max-w-[90vw] max-h-[90vh] mx-auto"
             ref={cropRef}
           ></canvas>
 
@@ -367,13 +367,13 @@ export default function Home() {
         </div>
       </div>
       ;{/* Button Section */}
-      <div className="absolute bottom-10 z-40 w-full flex justify-center">
+      <div className="absolute bottom-[20%] md:bottom-20 z-50 w-full flex justify-center">
         <button
-          className="flex items-center gap-3 bg-blue-600 text-white font-bold rounded-full px-6 py-2 shadow-md hover:bg-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-300 transition-all duration-300"
+          className="flex items-center gap-3 bg-blue-600 text-white font-bold rounded-full px-5 py-2 md:px-6 md:py-3 lg:px-8 lg:py-4 shadow-lg hover:bg-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-300 transition-all duration-300"
           onClick={takePhoto}
         >
-          <LuScanLine size={28} />
-          <span className="text-lg">Click to Scan</span>
+          <LuScanLine className="w-6 h-6 md:w-7 md:h-7 lg:w-8 lg:h-8" />
+          <span className="text-base md:text-lg lg:text-xl">Click to Scan</span>
         </button>
       </div>
     </div>

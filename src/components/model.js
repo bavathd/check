@@ -1,5 +1,6 @@
-import '@google/model-viewer';
-import React ,{ useEffect, useRef, useState } from 'react';
+import "@google/model-viewer";
+import React, { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 
 const Model = ({
   src,
@@ -10,20 +11,18 @@ const Model = ({
   cameraControls = true,
   autoRotate = false,
   ar = false,
-  className = "w-96 h-96",
+  className = "w-full h-full",
   ...props
 }) => {
   const modelViewerRef = useRef(null);
   const [isARSupported, setIsARSupported] = useState(false);
   const [isPageLoaded, setIsPageLoaded] = useState(false);
   useEffect(() => {
- 
-      setIsPageLoaded(true);
-      const modelViewer = modelViewerRef.current;
-      if (modelViewer) {
-        setIsARSupported(modelViewer.canActivateAR);
-      }
-  
+    setIsPageLoaded(true);
+    const modelViewer = modelViewerRef.current;
+    if (modelViewer) {
+      setIsARSupported(modelViewer.canActivateAR);
+    }
   }, []);
   const activateAR = async () => {
     if (modelViewerRef.current) {
@@ -36,48 +35,48 @@ const Model = ({
       }
     }
   };
-// useEffect(() => {
-  
-//   activateAR()
-// })
-  
+  // useEffect(() => {
+
+  //   activateAR()
+  // })
 
   return (
-    <div className="flex flex-col items-center">
-    {isPageLoaded ? (
-      <>
-      <model-viewer
-        ref={modelViewerRef}
-        src={src}
-        ios-src={iosSrc}
-        poster={poster}
-        alt={alt}
-        ar={true}
-        ar-mode
-        shadow-intensity={shadowIntensity}
-        camera-controls={cameraControls}
-        auto-rotate={autoRotate}
-        className={className}
-        {...props}
-      >
-        <button
-          // slot="ar-button"
-          className="custom-ar-button"
-          onClick={activateAR}
-        >
-          
-        </button>
-      </model-viewer>
-      <p className="mt-4 text-cyan-600">
-        AR Support: {isARSupported ? "Supported" : "Not Supported"}
-      </p>
-      </>
-
+    <div className="relative flex flex-col items-center">
+      {isPageLoaded ? (
+        <>
+          <model-viewer
+            ref={modelViewerRef}
+            src={src}
+            ios-src={iosSrc}
+            poster={poster}
+            alt={alt}
+            ar={true}
+            ar-mode
+            shadow-intensity={shadowIntensity}
+            camera-controls={cameraControls}
+            auto-rotate={autoRotate}
+            className={className}
+            {...props}
+          ></model-viewer>
+          <button
+            className="custom-ar-button bg-blue-500 px-4 py-2 rounded-xl absolute bottom-[20%] flex items-center space-x-2 shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75 transition-all"
+            onClick={activateAR}
+          >
+            <img
+              src="./myplace.png"
+              alt="AR Icon"
+              className="w-8 h-8  filter invert "
+            />
+            <span className="text-white">
+              {isARSupported ? "See in my World" : "See in my World"}
+            </span>
+          </button>
+        </>
       ) : (
         <p>Loading, please wait...</p>
       )}
     </div>
   );
-}
+};
 
 export default Model;
