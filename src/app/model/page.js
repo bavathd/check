@@ -75,8 +75,8 @@ export default function Home() {
 
 
     const viewWord = useCallback(async() => {
-        
-      setWord('apple')
+      const getWord = window.sessionStorage.getItem('word');
+      setWord(getWord)
       console.log(word);
       const list   = await getModels();
       setModellist(list)

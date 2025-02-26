@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState,useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { LuScanLine } from "react-icons/lu";
 ;
@@ -19,7 +19,33 @@ export default function Home() {
   const [change, setchange] = useState(false);
   const [items, setItem] = useState([])
   const router = useRouter();
+  const getModels = useCallback(async() => {
+        try {
+        const response = await fetch(
+          `https://e60tr3t3xe.execute-api.ap-south-1.amazonaws.com/dev/models`,
+          {
+          
+            method: "GET",
+            body: null
+          
+          }
+        );
+  
+        if (!response.ok) {
+          throw new Error(`Failed to complete upload: ${response.statusText}`);
+        }
+        
+        console.log("Upload completed successfully!");
+        console.log(response)
+        return response.json()
+      } catch (error) {
+        console.error("Error in completeUpload:", error);
+        throw error;
+      }
+      
+      },[]);
 
+    
   const getVideo = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -90,7 +116,8 @@ export default function Home() {
         console.log(items);
         word.split("\n").forEach((element) => {
           const x = element.toLowerCase();
-          if (items.includes(x)) {
+          const lowerCaseItems = items.map((item) => item.toLowerCase()); 
+          if (lowerCaseItems.includes(x)) {
             window.sessionStorage.setItem("word", x);
             setchange(true);
           }
@@ -199,22 +226,18 @@ export default function Home() {
   }
   
   useEffect(()=>{
-    fetch("/data.json")
-    .then((response)=>{
-      if(!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-
+    (async () => {
+      try {
+        const data = await getModels();
+        console.log("Data fetched:", data);
+        const objectNames = data.map((item) => item.object_name);
+        console.log("Objects fetched:", objectNames); 
+        setItem(objectNames || []);
+      } catch (error) {
+        console.error("Error fetching data:", error);
       }
-      return response.json();
-    })
-    .then((data)=> {
-      console.log("Data fetched:", data);
-      setItem(data.words || []);
-    })
-    .catch((error) => {
-      console.error("Error fetching data:", error);
-    });
-  },[])
+    })();
+  },[getModels])
 
 
 
